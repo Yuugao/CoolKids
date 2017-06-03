@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="./css/UI.css" />
+    <title>CoolKids</title>
+</head>
+
+<body>
+    <div class="wrapper">
+        <div id="frontCover">
+            <div class="frontFooter">
+                <div id="imageTake">
+                    <label>
+                        <input type="file" id="take-picture" accept="image/*">
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div id="contentCover">
+            <div class="header">
+                <h2 class="mainTitle">coolkids</h2>
+            </div>
+            <div class="content">
+                <div id="imagePre" style="text-align:center">
+                    <img src="about:blank" alt="" id="show-picture" style="position:absolute">
+                    <img id="wait" src="img/status.gif" style="position:absolute;top:50%;left:47%;display:none;z-index:100" />
+                </div>
+                <div class="overlay">
+                    <div class="lightbox">
+                        <div class="textBox">
+                        <p class="here">这个是</p>
+                        <p class="resNameCN">你猜呀</p>
+                        <p class="resNameEN">yooo</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="contentFooter">
+                <div id="cancel">
+                    <input type="file" class="take-picture" id="change-picture" accept="image/*">
+                </div>
+                <div id="sure">
+                    <input type="submit" id="submit" value="确定">
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script src="./js/jquery.min.js"></script>
+    <script src="./js/UI.js"></script>
+    <script src="./js/cameraAPI.js"></script>
+
+    <script type="text/javascript">
+        var show = document.getElementById("show-picture");
+        var changepicture = document.getElementById("change-picture");
+        /*var mycv = document.getElementById("cv");
+        var myctx = mycv.getContext("2d");*/
+        var x = 0;
+        var y = 0;
+
+
+
+        $("#cancel").click(function() {
+            show.src = "about:blank";
+            $("#show-picture").hide();
+            changepicture.onchange = function(e) {
+                var files = event.target.files;
+                var URL = window.URL || window.webkitURL;
+                // Create ObjectURL
+                var imgURL = URL.createObjectURL(files[0]);
+
+                // Set img src to ObjectURL
+                show.src = imgURL;
+
+
+                $("#show-picture").show();
+            }
+        })
+
+
+        $("#sure").click(function() {
+            $("#wait").show();
+            $.ajax({
+                type: "GET",
+                url: "demo.php",
+                //type:json,
+                success: function(data) {
+                    data = [{
+                            begin: {
+                                x: 0.2,
+                                y: 0.3
+                            },
+                            end: {
+                                x: 0.3,
+                                y: 0.5
+                            },
+                            info: "chair"
+                        },
+                        {
+                            begin: {
+                                x: 0.6,
+                                y: 0.4
+                            },
+                            end: {
+                                x: 0.65,
+                                y: 0.8
+                            },
+                            info: "bike"
+                        }
+                    ]
+                    console.log(data);
+                    $("#wait").hide();
+
+                    $("#show-picture").click(function(e) {
+                        var rect = show.getBoundingClientRect();
+
+                        var x = (e.pageX - rect.left) / this.width;
+                        var y = (e.pageY - rect.top) / this.height;
+
+                        console.log(x);
+                        console.log(y);
+                        for (var i = 0; i < data.length; i++) {
+                            if (x > data[i]["begin"]["x"] && x < data[i]["end"]["x"] &&
+                                y > data[i]["begin"]["y"] && y < data[i]["end"]["y"]) {
+                                console.log(data[i]["info"]);
+                                $('.resNameEN').html(data[i]["info"]);
+                                $('.overlay').show();
+
+                                $('.lightbox').click(function(event) {
+                                    $('.overlay').hide();
+                                });
+                            }
+                        }
+                    })
+
+                }
+            })
+        })
+    </script>
+</body>
+
+</html>
